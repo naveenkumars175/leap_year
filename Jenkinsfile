@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/naveenkumars175/button-click-app.git'
+                git branch: 'main', credentialsId: 'github-credentials', url: 'https://github.com/naveenkumars175/button-click-app.git'
             }
         }
         stage('Build WAR') {
@@ -17,11 +17,16 @@ pipeline {
                 sh 'mv build/button-click-app.war /home/naveenkumar/tomcat9/webapps/'
             }
         }
-        stage('Restart Tomcat') {
+        stage('Stop Tomcat') {
             steps {
                 sh '/home/naveenkumar/tomcat9/bin/shutdown.sh || true'
+            }
+        }
+        stage('Start Tomcat') {
+            steps {
                 sh '/home/naveenkumar/tomcat9/bin/startup.sh'
             }
         }
     }
 }
+
