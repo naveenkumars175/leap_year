@@ -13,10 +13,12 @@ pipeline {
             }
         }
         stage('Deploy to Tomcat') {
-            steps {
-                sh 'mv build/button-click-app.war /home/naveenkumar/tomcat9/webapps/'
-            }
-        }
+	    steps {
+	        sh 'sudo mv build/button-click-app.war /home/naveenkumar/tomcat9/webapps/'
+	    }
+	}
+
+
         stage('Stop Tomcat') {
             steps {
                 sh '/home/naveenkumar/tomcat9/bin/shutdown.sh || true'
