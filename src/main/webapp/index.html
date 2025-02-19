@@ -3,20 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Button Click Animation</title>
-    <style>
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        button:active {
-            transform: scale(1.1);
-        }
-    </style>
+    <title>Leap Year Checker</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <button onclick="alert('Button Clicked!')">Click Me</button>
+    <div class="container">
+        <h1>Leap Year Checker</h1>
+        <input type="number" id="yearInput" placeholder="Enter a year">
+        <button onclick="checkLeapYear()">Check</button>
+        <p id="result"></p>
+    </div>
+    <script src="script.js"></script>
 </body>
 </html>
+
