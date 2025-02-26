@@ -11,6 +11,7 @@ pipeline {
             steps {
                 sh 'mkdir -p build'
                 sh 'jar -cvf build/leap-year.war -C src/main/webapp .'
+		sh 'ls -l build/'
             }
         }
 
