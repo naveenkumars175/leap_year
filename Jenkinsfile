@@ -7,20 +7,17 @@ pipeline {
             }
         }
 
-        stage('Build WAR') {
+        stage('Prepare WAR File') {
             steps {
                 sh 'mkdir -p build'
-                sh 'jar -cvf build/leap-year.war -C src/main/webapp .'
-		sh 'ls -l build/'
-		sh 'sudo cp /home/naveenkumar/tomcat9/webapps/leap-year.war build/leap-year.war'
-	        sh 'sudo cp build/leap-year.war $WORKSPACE/'
-	        sh 'ls -l $WORKSPACE/'
+                sh 'cp build/leap-year.war $WORKSPACE/'  // Ensure the WAR file is available
+                sh 'ls -l $WORKSPACE/'  // Debugging: List files to verify WAR is present
             }
         }
 
         stage('Deploy to Tomcat') {
             steps {
-                sh 'sudo mv build/leap-year.war /home/naveenkumar/tomcat9/webapps/'
+                sh 'sudo mv $WORKSPACE/leap-year.war /home/naveenkumar/tomcat9/webapps/'
             }
         }
 
@@ -33,13 +30,15 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-		sh 'cp build/leap-year.war .'
-                sh 'docker build -t leap-year-app .'
+                sh 'cp $WORKSPACE/leap-year.war .'  // Copy WAR to Docker build context
+                sh 'docker build -t leap-year-app .'  // Build Docker image
             }
         }
 
         stage('Run Docker Container') {
             steps {
+                sh 'docker stop leap-year-container || true'  // Stop existing container if running
+                sh 'docker rm leap-year-container || true'  // Remove old container
                 sh 'docker run -d -p 8080:8080 --name leap-year-container leap-year-app'
             }
         }
