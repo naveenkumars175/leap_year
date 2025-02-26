@@ -12,8 +12,8 @@ pipeline {
                 sh 'mkdir -p build'
                 sh 'jar -cvf build/leap-year.war -C src/main/webapp .'
 		sh 'ls -l build/'
-		sh 'cp /home/naveenkumar/tomcat9/webapps/leap-year.war build/leap-year.war'
-        sh 'cp build/leap-year.war $WORKSPACE/'
+		sh 'sudo cp /home/naveenkumar/tomcat9/webapps/leap-year.war build/leap-year.war'
+	        sh 'sudo cp build/leap-year.war $WORKSPACE/'
 	        sh 'ls -l $WORKSPACE/'
             }
         }
