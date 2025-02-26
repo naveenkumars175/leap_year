@@ -9,36 +9,30 @@ pipeline {
 
         stage('Prepare WAR File') {
             steps {
-                 sh 'mkdir -p build'
-                 sh 'sudo cp build/leap-year.war $WORKSPACE/'  // Use sudo if necessary
-                 sh 'ls -l $WORKSPACE/'  // Debugging: List files to verify WAR is present
-            }
-        }
-
-        stage('Deploy to Tomcat') {
-            steps {
-                sh 'sudo mv $WORKSPACE/leap-year.war /home/naveenkumar/tomcat9/webapps/'
+                sh 'mkdir -p build'
+                sh 'sudo cp build/leap-year.war $WORKSPACE/'  
+                sh 'sudo cp build/leap-year.war /home/naveenkumar/tomcat9/webapps/'  // Copy instead of move
+                sh 'ls -l $WORKSPACE/'  // Debugging
             }
         }
 
         stage('Restart Tomcat') {
             steps {
                 sh 'sudo /home/naveenkumar/tomcat9/bin/shutdown.sh || echo "Tomcat not running, skipping shutdown"'
+                sleep 5  // Allow time for shutdown
                 sh 'sudo /home/naveenkumar/tomcat9/bin/startup.sh'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh 'cp $WORKSPACE/leap-year.war .'  // Copy WAR to Docker build context
-                sh 'docker build -t leap-year-app .'  // Build Docker image
+                sh 'cp $WORKSPACE/leap-year.war .'
+                sh 'docker build -t leap-year-app .'
             }
         }
 
         stage('Run Docker Container') {
             steps {
-                sh 'docker stop leap-year-container || true'  // Stop existing container if running
-                sh 'docker rm leap-year-container || true'  // Remove old container
                 sh 'docker run -d -p 8080:8080 --name leap-year-container leap-year-app'
             }
         }
