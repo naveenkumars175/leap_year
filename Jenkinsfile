@@ -8,16 +8,21 @@ pipeline {
             }
         }
 
-        stage('Prepare WAR File') {
+        stage('Compile and Package') {
             steps {
-                sh 'mkdir -p build'
-                sh 'cp build/leap_year.war /var/lib/jenkins/workspace/Leap-year/'
-                sh 'cp build/leap_year.war /home/naveenkumar/tomcat9/webapps/'
+                sh 'javac -d build $(find src -name "*.java")'
+                sh 'mkdir -p build/WEB-INF/classes'
+                sh 'cp -r build/* build/WEB-INF/classes/'
+                sh 'mkdir -p build/WEB-INF'
+                sh 'cp -r web/WEB-INF/* build/WEB-INF/'
+                sh 'jar cvf build/leap_year.war -C build .'
             }
         }
 
-        stage('Restart Tomcat') {
+        stage('Deploy to Tomcat') {
             steps {
+                sh 'cp build/leap_year.war /home/naveenkumar/tomcat9/webapps/'
+
                 script {
                     sh '''
                     if pgrep -f "org.apache.catalina.startup.Bootstrap" > /dev/null
