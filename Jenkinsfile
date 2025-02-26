@@ -22,7 +22,7 @@ pipeline {
 
         stage('Restart Tomcat') {
             steps {
-                sh 'sudo /home/naveenkumar/tomcat9/bin/shutdown.sh || true'
+                sh 'sudo /home/naveenkumar/tomcat9/bin/shutdown.sh || echo "Tomcat not running, skipping shutdown"'
                 sh 'sudo /home/naveenkumar/tomcat9/bin/startup.sh'
             }
         }
