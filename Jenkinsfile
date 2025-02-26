@@ -11,8 +11,8 @@ pipeline {
         stage('Prepare WAR File') {
             steps {
                 sh 'mkdir -p build'
-                sh 'sudo cp build/leap_year.war /var/lib/jenkins/workspace/Leap-year/'
-                sh 'sudo cp build/leap_year.war /home/naveenkumar/tomcat9/webapps/'
+                sh 'cp build/leap_year.war /var/lib/jenkins/workspace/Leap-year/'
+                sh 'cp build/leap_year.war /home/naveenkumar/tomcat9/webapps/'
             }
         }
 
