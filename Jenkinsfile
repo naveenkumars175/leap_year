@@ -1,11 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        TOMCAT_HOME = "/home/naveenkumar/tomcat9"
-        WORKSPACE_DIR = "/var/lib/jenkins/workspace/Leap-year"
-    }
-
     stages {
         stage('Clone Repository') {
             steps {
@@ -16,54 +11,53 @@ pipeline {
         stage('Prepare WAR File') {
             steps {
                 sh 'mkdir -p build'
-                sh 'sudo cp build/leap-year.war ${WORKSPACE_DIR}/'
-                sh 'sudo cp build/leap-year.war ${TOMCAT_HOME}/webapps/'
+                sh 'sudo cp build/leap-year.war /var/lib/jenkins/workspace/Leap-year/'
+                sh 'sudo cp build/leap-year.war /home/naveenkumar/tomcat9/webapps/'
             }
         }
 
         stage('Restart Tomcat') {
             steps {
                 script {
-                    def tomcatPID = sh(script: "ps -ef | grep tomcat | grep -v grep | awk '{print \$2}'", returnStdout: true).trim()
-                    if (tomcatPID) {
-                        sh "sudo ${TOMCAT_HOME}/bin/shutdown.sh"
+                    sh '''
+                    if pgrep -f "org.apache.catalina.startup.Bootstrap" > /dev/null
+                    then
+                        echo "Stopping Tomcat..."
+                        sudo /home/naveenkumar/tomcat9/bin/shutdown.sh
                         sleep 5
-                    } else {
-                        echo "Tomcat is not running, skipping shutdown."
-                    }
+                    else
+                        echo "Tomcat is not running. Skipping shutdown."
+                    fi
+                    '''
+                    sh 'sudo /home/naveenkumar/tomcat9/bin/startup.sh'
                 }
-                sh "sudo ${TOMCAT_HOME}/bin/startup.sh"
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh '''
-                if [ ! -f leap-year.war ]; then
-                    cp -f ${WORKSPACE_DIR}/leap-year.war .
-                fi
-                docker build -t leap-year-app .
-                '''
+                sh 'docker build -t leap-year-app .'
             }
         }
 
         stage('Run Docker Container') {
             steps {
                 script {
-                    def containerExists = sh(script: "docker ps -aqf 'name=leap-year-container'", returnStdout: true).trim()
-                    if (containerExists) {
-                        sh "docker stop leap-year-container && docker rm leap-year-container"
-                    }
+                    sh '''
+                    if docker ps -a --format '{{.Names}}' | grep -q leap-year-container; then
+                        echo "Removing existing container..."
+                        docker stop leap-year-container
+                        docker rm leap-year-container
+                    fi
+
+                    docker run -d --name leap-year-container -p 9090:8080 leap-year-app
+                    '''
                 }
-                sh "docker run -d --name leap-year-container -p 8080:8080 leap-year-app"
             }
         }
     }
 
     post {
-        success {
-            echo "Deployment successful!"
-        }
         failure {
             echo "Deployment failed. Check logs for errors."
         }
