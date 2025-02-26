@@ -33,6 +33,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
+		sh 'cp build/leap-year.war .'
                 sh 'docker build -t leap-year-app .'
             }
         }
