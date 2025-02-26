@@ -9,9 +9,9 @@ pipeline {
 
         stage('Prepare WAR File') {
             steps {
-                sh 'mkdir -p build'
-                sh 'cp build/leap-year.war $WORKSPACE/'  // Ensure the WAR file is available
-                sh 'ls -l $WORKSPACE/'  // Debugging: List files to verify WAR is present
+                 sh 'mkdir -p build'
+                 sh 'sudo cp build/leap-year.war $WORKSPACE/'  // Use sudo if necessary
+                 sh 'ls -l $WORKSPACE/'  // Debugging: List files to verify WAR is present
             }
         }
 
